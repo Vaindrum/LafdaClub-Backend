@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema(
         },
         googleId:{
             type: String,
-            unique: true
+            unique: true,
+            sparse: true
         },
         username: {
             type: String,
@@ -19,6 +20,11 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String,
             minlength: 8,
+        },
+        role: {
+            type: String,
+            enum: ["user","admin"],
+            default: "user"
         },
         bio:{
             type: String,

@@ -6,6 +6,7 @@ import passport from 'passport';
 import session from 'express-session';
 import { connectDB } from './lib/db.js';
 import authRoutes from './routes/auth.route.js'
+import productRoutes from './routes/product.route.js'
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.get('/api/test', (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/product", productRoutes);
 
 
 // app.all("*",(req,res) => {

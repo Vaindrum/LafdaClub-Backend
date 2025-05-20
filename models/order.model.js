@@ -9,7 +9,13 @@ const orderSchema = new mongoose.Schema({
   }],
   totalAmount: Number,
   status: { type: String, enum: ["pending", "paid", "shipped", "delivered"], default: "pending" },
-  paymentId: String
+  paymentId: String,
+  shippingDetails: {
+    name: String,
+    address: String,
+    phone: String,
+    pincode: String
+  },
 }, { timestamps: true });
 
 export default mongoose.model("Order", orderSchema);

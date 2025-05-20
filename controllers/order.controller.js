@@ -20,7 +20,8 @@ export const submitOrder = async (req, res) => {
       items: orderItems,
       totalAmount,
       paymentId,
-      status: "paid"
+      status: "paid",
+      shippingDetails
     });
 
     cart.items = [];
@@ -75,7 +76,7 @@ export const getAllOrders = async (req, res) => {
 export const updateOrderStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
-    const updatedOrder = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, { status }, { runValidators: true }, { new: true });
     res.status(200).json(updatedOrder);
   } catch (err) {
     console.log("Error in updateOrderStatus:", err.message);

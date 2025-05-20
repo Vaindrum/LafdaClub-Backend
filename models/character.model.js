@@ -23,15 +23,15 @@ const characterSchema = new mongoose.Schema(
     },
     strength: {
         type: Number,
-        default: 50
+        default: 3
     },
     agility: {
         type: Number,
-        default: 50
+        default: 3
     },
-    intelligence: {
+    battleIq: {
         type: Number,
-        default: 50
+        default: 3
     },
     isAvailable: {
         type: Boolean,

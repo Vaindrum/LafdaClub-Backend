@@ -5,6 +5,7 @@ import { getAllOrders, getOrder, getOrders, submitOrder, updateOrderStatus } fro
 
 const router = express.Router();
 
+// admin
 router.post("/update", protectRoute, adminMiddleware, updateOrderStatus);
 router.get("/allorders", protectRoute, adminMiddleware, getAllOrders);
 

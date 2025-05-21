@@ -4,10 +4,7 @@ import {
   createCharacter,
   createStage,
   createWeapon,
-  getAnnouncers,
-  getCharacters,
-  getStages,
-  getWeapons
+  getGameDetails,
 } from "../controllers/game.controller.js";
 
 const router = express.Router();
@@ -17,9 +14,6 @@ router.post("/character", createCharacter);
 router.post("/stage", createStage);
 router.post("/weapon", createWeapon);
 
-router.get("/announcers", getAnnouncers);
-router.get("/characters", getCharacters);
-router.get("/stages", getStages);
-router.get("/weapons", getWeapons);
+router.get("/details", getGameDetails);
 
 export default router;

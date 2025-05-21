@@ -5,7 +5,8 @@ const announcerSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
   description: { type: String, required: true }, // personality or tone ("sarcastic AI", "epic deep voice")
   voiceStyle: { type: String }, // optional: "dark", "funny", "epic"
-  avatar: { type: String }, 
+  avatar: { type: String },
+  image: { type: String }, 
   isAvailable: { type: Boolean, default: true }
 });
 

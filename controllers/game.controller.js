@@ -44,42 +44,15 @@ export const createWeapon = async (req, res) => {
 };
 
 
-export const getAnnouncers = async (req, res) => {
+export const getGameDetails = async (req, res) => {
   try {
-    const announcers = await Announcer.find();
-    res.status(200).json(announcers);
-  } catch (err) {
-    console.log("getAnnouncers error:", err.message);
-    res.status(500).json({ message: "Failed to fetch announcers" });
-  }
-};
-
-export const getCharacters = async (req, res) => {
-  try {
+    // const announcers = await Announcer.find();
     const characters = await Character.find();
-    res.status(200).json(characters);
-  } catch (err) {
-    console.log("getCharacters error:", err.message);
-    res.status(500).json({ message: "Failed to fetch characters" });
-  }
-};
-
-export const getStages = async (req, res) => {
-  try {
     const stages = await Stage.find();
-    res.status(200).json(stages);
-  } catch (err) {
-    console.log("getStages error:", err.message);
-    res.status(500).json({ message: "Failed to fetch stages" });
-  }
-};
-
-export const getWeapons = async (req, res) => {
-  try {
     const weapons = await Weapon.find();
-    res.status(200).json(weapons);
+    res.status(200).json({characters: characters, stages: stages, weapons: weapons});
   } catch (err) {
-    console.log("getWeapons error:", err.message);
-    res.status(500).json({ message: "Failed to fetch weapons" });
+    console.log("getGameDetails error:", err.message);
+    res.status(500).json({ message: "Failed to fetch game details" });
   }
 };

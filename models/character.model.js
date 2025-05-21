@@ -11,13 +11,17 @@ const characterSchema = new mongoose.Schema(
         type: String,
         required: true,
     },
+    prompt: {
+        type: String,
+        required: true,
+    },
     avatar: {
         type: String,
     },
     image:{
         type: String,
     },
-    weapon: {
+    defaultWeapon: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Weapon" 
     },

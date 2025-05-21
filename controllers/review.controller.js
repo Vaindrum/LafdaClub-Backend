@@ -1,4 +1,6 @@
 import Review from "../models/review.model.js";
+import Comment from "../models/comment.model.js";
+import Report from "../models/report.model.js";
 
 export const createReview = async (req, res) => {
   try {
@@ -18,12 +20,19 @@ export const createReview = async (req, res) => {
 
 export const deleteReview = async (req, res) => {
   try {
-    const review = await Review.findById(req.params.reviewId);
-    if (!review) return res.status(404).json({ message: "Review not found" });
-    if (!review.user.equals(req.user._id)) return res.status(403).json({ message: "Unauthorized" });
+    const reviewId = req.params.reviewId;
 
-    await review.deleteOne();
-    res.status(200).json({ message: "Review deleted" });
+    // Delete the review
+    const review = await Review.findByIdAndDelete(reviewId);
+    if (!review) return res.status(404).json({ message: "Review not found" });
+
+    // Delete related comments
+    await Comment.deleteMany({ review: reviewId });
+
+    // Delete related reports
+    await Report.deleteMany({ target: reviewId });
+
+    res.status(200).json({ message: "Review deleted successfully" });
   } catch (err) {
     console.log("deleteReview error:", err.message);
     res.status(500).json({ message: "Internal server error" });
@@ -32,8 +41,17 @@ export const deleteReview = async (req, res) => {
 
 export const reportReview = async (req, res) => {
   try {
-    await Review.findByIdAndUpdate(req.params.reviewId, { $addToSet: { reports: req.user._id } });
-    res.status(200).json({ message: "Review reported" });
+    const { reviewId, reason } = req.body;
+    const review = await Review.findById(reviewId);
+    if (!review) return res.status(404).json({ message: "Review not found" });
+
+    const report = await Report.create({
+      type: "Review",
+      target: reviewId,
+      reportedBy: req.user._id,
+      reason
+    });
+    res.status(201).json({ message: "Review reported", report });
   } catch (err) {
     console.log("reportReview error:", err.message);
     res.status(500).json({ message: "Internal server error" });
@@ -107,6 +125,18 @@ export const getReview = async (req, res) => {
     res.status(200).json(review);
   } catch (err) {
     console.log("getReview error:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getReports = async (req, res) => {
+  try {
+    const reports = await Report.find()
+      .populate("reportedBy", "username")
+      .populate("target");
+    res.status(200).json(reports);
+  } catch (err) {
+    console.log("getReports error:", err.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };

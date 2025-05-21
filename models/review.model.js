@@ -8,7 +8,6 @@ const reviewSchema = new mongoose.Schema({
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   dislikes: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
-  reports: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true });
 
 export default mongoose.model("Review", reviewSchema);

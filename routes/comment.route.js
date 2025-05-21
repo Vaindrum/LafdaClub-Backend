@@ -7,8 +7,8 @@ const router = express.Router();
 
 router.post("/create", protectRoute, createComment);
 router.post("/delete/:commentId", protectRoute, deleteComment);
-router.post("/report/:commentId", protectRoute, reportComment);
 router.post("/like/:commentId", protectRoute, toggleLikeComment);
 router.post("/dislike/:commentId", protectRoute, toggleDislikeComment);
+router.post("/report", protectRoute, reportComment);
 
 export default router;

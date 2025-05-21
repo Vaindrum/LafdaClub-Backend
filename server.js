@@ -11,6 +11,7 @@ import cartRoutes from './routes/cart.route.js'
 import orderRoutes from './routes/order.route.js'
 import reviewRoutes from './routes/review.route.js'
 import commentRoutes from './routes/comment.route.js'
+import gameRoutes from './routes/game.route.js'
 
 dotenv.config();
 
@@ -47,6 +48,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/comment", commentRoutes);
+app.use("/api/game", gameRoutes);
 
 
 // app.all("*",(req,res) => {

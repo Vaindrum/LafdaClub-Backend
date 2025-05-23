@@ -1,9 +1,12 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import { adminMiddleware } from "../middleware/admin.middleware.js";
-import { getAllOrders, getOrder, getOrders, submitOrder, updateOrderStatus } from "../controllers/order.controller.js";
+import { getAllOrders, getOrder, getOrders, submitOrder, updateOrderStatus, createOrder, verifyPayment } from "../controllers/order.controller.js";
 
 const router = express.Router();
+
+router.post("/create-order", protectRoute, createOrder);
+router.post("/verify", verifyPayment);
 
 // admin
 router.post("/update", protectRoute, adminMiddleware, updateOrderStatus);

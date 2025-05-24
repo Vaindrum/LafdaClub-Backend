@@ -7,16 +7,18 @@ import {
   getGameDetails,
   startBattle,
 } from "../controllers/game.controller.js";
+import { adminMiddleware } from "../middleware/admin.middleware.js";
+import { tryAuth } from "../middleware/guest.middleware.js";
 
 const router = express.Router();
 
-router.post("/announcer", createAnnouncer);
-router.post("/character", createCharacter);
-router.post("/stage", createStage);
-router.post("/weapon", createWeapon);
+router.post("/announcer", adminMiddleware, createAnnouncer);
+router.post("/character", adminMiddleware, createCharacter);
+router.post("/stage", adminMiddleware, createStage);
+router.post("/weapon", adminMiddleware, createWeapon);
 
 router.get("/details", getGameDetails);
 
-router.get("/fight", startBattle);
+router.get("/fight", tryAuth, startBattle);
 
 export default router;

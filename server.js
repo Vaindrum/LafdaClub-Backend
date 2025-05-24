@@ -12,6 +12,7 @@ import orderRoutes from './routes/order.route.js'
 import reviewRoutes from './routes/review.route.js'
 import commentRoutes from './routes/comment.route.js'
 import gameRoutes from './routes/game.route.js'
+import statsRoutes from './routes/stats.route.js'
 
 dotenv.config();
 
@@ -57,6 +58,7 @@ app.use("/api/order", orderRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/comment", commentRoutes);
 app.use("/api/game", gameRoutes);
+app.use("/api/stats", statsRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });

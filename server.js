@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
+import "./lib/passport.js"; 
 import session from 'express-session';
 import { connectDB } from './lib/db.js';
 import authRoutes from './routes/auth.route.js'
@@ -47,6 +48,9 @@ app.use(session({
     cookie: { secure: process.env.NODE_ENV === "production" },
 }))
 
+
+app.use(passport.initialize());
+app.use(passport.session());
 // app.get('/api/test', (req, res) => {
 //     res.json({ message: "Test route working!" });
 // });

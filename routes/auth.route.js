@@ -12,22 +12,24 @@ router.post("/logout", logout);
 
 router.get("/google", passport.authenticate("google", {scope: ["profile","email"]}));
 
-router.get("/google/callback", passport.authenticate("google", {failureRedirect: `${process.env.ORIGIN}`
-} ),
-(req,res) => {
-    if(!req.user){
-        return res.status(401).json({message: "Google authentication failed"});
-    }
+router.get("/google/callback", passport.authenticate("google", {
+  failureRedirect: `${process.env.ORIGIN}`
+}), (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Google authentication failed" });
+  }
 
-    const token = generateToken(req.user._id, res);
-    res.cookie("jwt", token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-    });
-    return res.redirect(`${process.env.ORIGIN}/auth-success?token=${token}`);
-})
+  const token = generateToken(req.user._id, req.user.role, res);
+
+  res.cookie("jwt", token, {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  });
+
+  return res.redirect(`${process.env.ORIGIN}/auth-success?token=${token}`);
+});
 
 
 router.patch("/update-profile",protectRoute,updateProfile);

@@ -62,7 +62,7 @@ export const getGameDetails = async (req, res) => {
 export const startBattle = async (req, res) => {
   try {
     const userId = req.user ? req.user._id : null;
-    console.log(userId);
+    console.log("User ID: ", userId);
     const { characterId1, weaponId1, characterId2, weaponId2, stageId, announcerId } = req.body;
     const character1 = await Character.findById(characterId1);
     const character2 = await Character.findById(characterId2);
@@ -77,7 +77,7 @@ export const startBattle = async (req, res) => {
     const winnerPlayer = winnerId === characterId1 ? 'Player 1' : 'Player 2'; 
     const loserId = winnerId === characterId1 ? characterId2 : characterId1;
 
-    console.log(winnerId);
+    console.log("Winner: ", winnerId);
 
     const prompt = `Create a battle scenario story between Player 1 (${character1.name}) and Player 2 (${character2.name}) where the final winner after a tough fought out battle is to be ${winnerPlayer}: Player 1 description: ${character1.prompt} & Player 2 description: ${character2.prompt}. Player 1's weapon is ${weapon1.name} and its description is ${weapon1.prompt} & Player 2's weapon is ${weapon2.name} and its description is ${weapon2.prompt}. Player 1's stats - strength:${character1.strength}, agility:${character1.agility} , battleIq:${character1.battleIq} & Player 2's stats - strength:${character2.strength}, agility:${character2.agility}, battleIq:${character2.battleIq}. They are having an epic battle on the stage titled '${stage.name}' which has the following description: ${stage.description}. These details about the characters, weapons and stages are just for reference. Do not use them as it is in your story. Add some flair and use creative thinking to make up attacks or scenarios based up on those details.)`
 

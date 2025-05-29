@@ -19,6 +19,6 @@ router.post("/weapon", adminMiddleware, createWeapon);
 
 router.get("/details", getGameDetails);
 
-router.get("/fight", tryAuth, startBattle);
+router.post("/fight", tryAuth, startBattle);
 
 export default router;

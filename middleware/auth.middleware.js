@@ -23,6 +23,7 @@ export const protectRoute = async (req,res,next) => {
         }
 
         req.user = user;
+        console.log("protectRoute middleware executed")
 
         next(); 
 

@@ -14,6 +14,7 @@ import reviewRoutes from './routes/review.route.js'
 import commentRoutes from './routes/comment.route.js'
 import gameRoutes from './routes/game.route.js'
 import statsRoutes from './routes/stats.route.js'
+import userRoutes from './routes/user.route.js'
 
 dotenv.config();
 
@@ -56,6 +57,7 @@ app.use(passport.session());
 // });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);

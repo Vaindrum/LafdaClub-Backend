@@ -124,79 +124,95 @@ export const userLeaderboards = async (req, res) => {
 };
 
 export const characterLeaderboards = async (req, res) => {
-    try {
-        const charAgg = await GameHistory.aggregate([
-            {
-                $facet: {
-                    asCharacter1: [
-                        { $group: { _id: "$character1", played: { $sum: 1 } } }
-                    ],
-                    asCharacter2: [
-                        { $group: { _id: "$character2", played: { $sum: 1 } } }
-                    ],
-                    wins: [
-                        { $group: { _id: "$winner", wins: { $sum: 1 } } }
-                    ]
-                }
-            },
-            {
-                $project: {
-                    allCharacters: {
-                        $concatArrays: ["$asCharacter1", "$asCharacter2"]
-                    },
-                    wins: "$wins"
-                }
-            },
-            { $unwind: "$allCharacters" },
-            {
-                $group: {
-                    _id: "$allCharacters._id",
-                    played: { $sum: "$allCharacters.played" }
-                }
-            },
-            {
-                $lookup: {
-                    from: "gamehistories", // collection name must match MongoDB collection
-                    let: { id: "$_id" },
-                    pipeline: [
-                        {
-                            $group: {
-                                _id: "$winner",
-                                wins: { $sum: 1 }
-                            }
-                        },
-                        {
-                            $match: {
-                                $expr: { $eq: ["$_id", "$$id"] }
-                            }
-                        },
-                        {
-                            $project: { _id: 0, wins: 1 }
-                        }
-                    ],
-                    as: "winData"
-                }
+  try {
+    const charAgg = await GameHistory.aggregate([
+      {
+        $facet: {
+          asCharacter1: [
+            { $group: { _id: "$character1", played: { $sum: 1 } } }
+          ],
+          asCharacter2: [
+            { $group: { _id: "$character2", played: { $sum: 1 } } }
+          ],
+          wins: [
+            { $group: { _id: "$winner", wins: { $sum: 1 } } }
+          ]
+        }
+      },
+      {
+        $project: {
+          allCharacters: { $concatArrays: ["$asCharacter1", "$asCharacter2"] },
+          wins: "$wins"
+        }
+      },
+      { $unwind: "$allCharacters" },
+      {
+        $group: {
+          _id: "$allCharacters._id",
+          played: { $sum: "$allCharacters.played" }
+        }
+      },
+      {
+        $lookup: {
+          from: "gamehistories", // not strictly needed since we have "wins" facet, but this ensures correct wins count
+          let: { charId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$winner", "$$charId"] } } },
+            { $group: { _id: null, wins: { $sum: 1 } } },
+            { $project: { _id: 0, wins: 1 } }
+          ],
+          as: "winData"
+        }
+      },
+      {
+        $addFields: {
+          wins: { $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] },
+          winRatio: {
+             $round: [
+              {
+                $cond: [
+                  { $eq: ["$played", 0] },
+                  0,
+                  { $divide: [{ $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] }, "$played"] }
+                ]
+              },
+              2
+            ]
+          }
+        }
+      },
+      { $sort: { winRatio: -1 } },
+      { $limit: 10 },
+      {
+        // Lookup each character’s name & image
+        $lookup: {
+          from: "characters", // make sure this matches your Characters collection name
+          localField: "_id",
+          foreignField: "_id",
+          as: "characterInfo"
+        }
+      },
+      { $unwind: "$characterInfo" },
+      {
+        // Final projection to include exactly the fields you want
+        $project: {
+          _id: 1,
+          name: "$characterInfo.name",
+          image: "$characterInfo.image",
+          played: 1,
+          wins: 1,
+          winRatio: 1
+        }
+      }
+    ]);
 
-            },
-            {
-                $addFields: {
-                    wins: { $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] },
-                    winRatio: { $divide: [{ $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] }, "$played"] }
-                }
-            },
-            { $sort: { winRatio: -1 } },
-            { $limit: 10 }
-        ]);
+    return res.status(200).json({topCharacters: charAgg});
+  } catch (err) {
+    console.log("characterLeaderboards error:", err.message);
+    return res.status(500).json({ message: "Failed to get character Leaderboards" });
+  }
+};
 
-        return res.status(200).json({
-            charAgg
-        })
-
-    } catch (err) {
-        console.log("characterLeaderboards error:", err.message);
-        res.status(500).json({ message: "Failed to get character Leaderboards" });
-    }
-}
 
 export const weaponLeaderboards = async (req, res) => {
     try {

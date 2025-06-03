@@ -9,6 +9,7 @@ const gameHistorySchema = new mongoose.Schema({
   stage: { type: mongoose.Schema.Types.ObjectId, ref: "Stage" },
   announcer: { type: mongoose.Schema.Types.ObjectId, ref: "Announcer" },
   winner: { type: mongoose.Schema.Types.ObjectId, ref: "Character" },
+  winnerWeapon: { type: mongoose.Schema.Types.ObjectId, ref: "Weapon"},
   loser: { type: mongoose.Schema.Types.ObjectId, ref: "Character" },
   createdAt: { type: Date, default: Date.now }
 });

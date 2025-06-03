@@ -215,89 +215,124 @@ export const characterLeaderboards = async (req, res) => {
 
 
 export const weaponLeaderboards = async (req, res) => {
-    try {
-        const weaponAgg = await GameHistory.aggregate([
-            {
-                $facet: {
-                    asWeapon1: [
-                        { $group: { _id: "$weapon1", played: { $sum: 1 } } }
-                    ],
-                    asWeapon2: [
-                        { $group: { _id: "$weapon2", played: { $sum: 1 } } }
-                    ],
-                    wins: [
-                        { $group: { _id: "$winner", wins: { $sum: 1 } } }
-                    ]
-                }
-            },
-            {
-                $project: {
-                    allWeapons: {
-                        $concatArrays: ["$asWeapon1", "$asWeapon2"]
-                    },
-                    wins: "$wins"
-                }
-            },
-            { $unwind: "$allWeapons" },
-            {
-                $group: {
-                    _id: "$allWeapons._id",
-                    played: { $sum: "$allWeapons.played" }
-                }
-            },
-            {
-                $lookup: {
-                    from: "gamehistories", // collection name must match your MongoDB collection
-                    let: { id: "$_id" },
-                    pipeline: [
-                        {
-                            $group: {
-                                _id: "$winner",
-                                wins: { $sum: 1 }
-                            }
-                        },
-                        {
-                            $match: {
-                                $expr: { $eq: ["$_id", "$$id"] }
-                            }
-                        },
-                        {
-                            $project: { _id: 0, wins: 1 }
-                        }
-                    ],
-                    as: "winData"
-                }
-            },
-            {
-                $addFields: {
-                    wins: { $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] },
-                    winRatio: { $divide: [{ $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] }, "$played"] }
-                }
-            },
-            { $sort: { winRatio: -1 } },
-            { $limit: 10 }
-        ]);
+  try {
+    const weaponAgg = await GameHistory.aggregate([
+      {
+        $facet: {
+          asWeapon1: [
+            { $group: { _id: "$weapon1", played: { $sum: 1 } } }
+          ],
+          asWeapon2: [
+            { $group: { _id: "$weapon2", played: { $sum: 1 } } }
+          ],
+          wins: [
+            { $group: { _id: "$winner", wins: { $sum: 1 } } }
+          ]
+        }
+      },
+      {
+        $project: {
+          allWeapons: { $concatArrays: ["$asWeapon1", "$asWeapon2"] },
+          wins: "$wins"
+        }
+      },
+      { $unwind: "$allWeapons" },
+      {
+        $group: {
+          _id: "$allWeapons._id",
+          played: { $sum: "$allWeapons.played" }
+        }
+      },
+      {
+        $lookup: {
+          from: "gamehistories",
+          let: { weaponId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$winnerWeapon", "$$weaponId"] } } },
+            { $group: { _id: null, wins: { $sum: 1 } } },
+            { $project: { _id: 0, wins: 1 } }
+          ],
+          as: "winData"
+        }
+      },
+      {
+        $addFields: {
+          wins: { $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] },
+          winRatio: {
+             $round: [
+              {
+                $cond: [
+                  { $eq: ["$played", 0] },
+                  0,
+                  { $divide: [{ $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] }, "$played"] }
+                ]
+              },
+              2
+            ]
+          }
+        }
+      },
+      { $sort: { winRatio: -1 } },
+      { $limit: 10 },
+      {
+        // Lookup each character’s name & image
+        $lookup: {
+          from: "weapons", // make sure this matches your Characters collection name
+          localField: "_id",
+          foreignField: "_id",
+          as: "weaponInfo"
+        }
+      },
+      { $unwind: "$weaponInfo" },
+      {
+        // Final projection to include exactly the fields you want
+        $project: {
+          _id: 1,
+          name: "$weaponInfo.name",
+          image: "$weaponInfo.image",
+          played: 1,
+          wins: 1,
+          winRatio: 1
+        }
+      }
+    ]);
 
-        return res.status(200).json({
-            weaponAgg
-        })
-
-    } catch (err) {
-        console.log("weaponLeaderboards error:", err.message);
-        res.status(500).json({ message: "Failed to get weapon Leaderboards" });
-    }
-}
+    return res.status(200).json({topWeapons: weaponAgg});
+  } catch (err) {
+    console.log("weaponLeaderboards error:", err.message);
+    return res.status(500).json({ message: "Failed to get weapon Leaderboards" });
+  }
+};
 
 export const stageLeaderboards = async (req, res) => {
     try {
         const topStages = await GameHistory.aggregate([
             { $group: { _id: "$stage", timesPicked: { $sum: 1 } } },
             { $sort: { timesPicked: -1 } },
-            { $limit: 10 }
+            { $limit: 10 },
+            {
+        // Lookup each character’s name & image
+        $lookup: {
+          from: "stages", // make sure this matches your Characters collection name
+          localField: "_id",
+          foreignField: "_id",
+          as: "stageInfo"
+        }
+      },
+      { $unwind: "$stageInfo" },
+            {
+        // Final projection to include exactly the fields you want
+        $project: {
+          _id: 1,
+          name: "$stageInfo.name",
+          image: "$stageInfo.image",
+          timesPicked: 1
+        }
+      }
         ]);
 
         return res.status(200).json({
-            topStages
+            topStages: topStages
         })
     } catch (err) {
         console.log("stageLeaderboards error:", err.message);
@@ -310,11 +345,30 @@ export const announcerLeaderboards = async (req, res) => {
         const topAnnouncers = await GameHistory.aggregate([
             { $group: { _id: "$announcer", timesPicked: { $sum: 1 } } },
             { $sort: { timesPicked: -1 } },
-            { $limit: 5 }
+            { $limit: 5 },
+            {
+        // Lookup each character’s name & image
+        $lookup: {
+          from: "announcers", // make sure this matches your Characters collection name
+          localField: "_id",
+          foreignField: "_id",
+          as: "announcerInfo"
+        }
+      },
+      { $unwind: "$announcerInfo" },
+            {
+        // Final projection to include exactly the fields you want
+        $project: {
+          _id: 1,
+          name: "$announcerInfo.name",
+          image: "$announcerInfo.image",
+          timesPicked: 1
+        }
+      }
         ]);
 
         return res.status(200).json({
-            topAnnouncers
+            topAnnouncers: topAnnouncers
         })
     } catch (err) {
         console.log("announcerLeaderboards error:", err.message);

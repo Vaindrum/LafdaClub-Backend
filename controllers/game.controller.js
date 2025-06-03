@@ -75,6 +75,7 @@ export const startBattle = async (req, res) => {
 
     const winnerId = Math.random() < 0.5 ? characterId1 : characterId2;
     const winnerPlayer = winnerId === characterId1 ? 'Player 1' : 'Player 2'; 
+    const winnerWeapon = winnerId === characterId1 ? weaponId1 : weaponId2;
     const loserId = winnerId === characterId1 ? characterId2 : characterId1;
 
     console.log("Winner: ", winnerId);
@@ -93,7 +94,8 @@ export const startBattle = async (req, res) => {
       stage: stageId,
       announcer: announcerId,
       winner: winnerId,
-      loser: loserId
+      loser: loserId,
+      winnerWeapon: winnerWeapon
     });
   }
     return res.json({ result });

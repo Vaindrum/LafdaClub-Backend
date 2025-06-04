@@ -6,7 +6,7 @@ import { toggleDislikeComment, toggleLikeComment } from "../controllers/comment.
 const router = express.Router();
 
 router.post("/create", protectRoute, createComment);
-router.post("/delete/:commentId", protectRoute, deleteComment);
+router.delete("/delete/:commentId", protectRoute, deleteComment);
 router.post("/like/:commentId", protectRoute, toggleLikeComment);
 router.post("/dislike/:commentId", protectRoute, toggleDislikeComment);
 router.post("/report", protectRoute, reportComment);

@@ -6,7 +6,7 @@ import { adminMiddleware } from "../middleware/admin.middleware.js";
 const router = express.Router();
 
 router.post("/create", protectRoute, createReview); 
-router.post("/delete/:reviewId", protectRoute, deleteReview);
+router.delete("/delete/:reviewId", protectRoute, deleteReview);
 router.post("/like/:reviewId", protectRoute, toggleLikeReview);
 router.post("/dislike/:reviewId", protectRoute, toggleDislikeReview);
 

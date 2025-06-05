@@ -4,7 +4,7 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/user", protectRoute, getUserStats);
+router.get("/user/:userId", getUserStats);
 router.get("/userLeaderboards", userLeaderboards);
 router.get("/characterLeaderboards", characterLeaderboards);
 router.get("/weaponLeaderboards", weaponLeaderboards);

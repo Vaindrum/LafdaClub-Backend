@@ -4,6 +4,7 @@ import Weapon from "../models/weapon.model.js";
 import Stage from "../models/stage.model.js";
 import Announcer from "../models/announcer.model.js";
 import User from "../models/user.model.js";
+import mongoose from "mongoose";
 
 const fetchUserStats = async (userId) => {
     const totalBattles = await GameHistory.countDocuments({ user: userId });
@@ -89,8 +90,12 @@ const fetchUserStats = async (userId) => {
 
 export const getUserStats = async (req, res) => {
     try {
-        const userId = req.user._id;
+        const userIdParam = req.params.userId;
+        const userId = new mongoose.Types.ObjectId(userIdParam);
+        console.log(userIdParam);
+        console.log(userId);
         const stats = await fetchUserStats(userId);
+        console.log(stats);
         res.status(200).json(stats);
     } catch (err) {
         console.log("getUserStats error:", err.message);

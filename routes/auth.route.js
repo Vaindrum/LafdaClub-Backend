@@ -28,7 +28,7 @@ router.get("/google/callback", passport.authenticate("google", {
     sameSite: "None",
   });
 
-  return res.redirect(`${process.env.ORIGIN}/auth-success?token=${token}`);
+  return res.redirect(`${process.env.ORIGIN}/authSuccess`);
 });
 
 

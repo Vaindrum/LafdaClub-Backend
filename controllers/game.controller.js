@@ -98,7 +98,7 @@ export const startBattle = async (req, res) => {
       winnerWeapon: winnerWeapon
     });
   }
-    return res.json({ result });
+    return res.json({ result: result, winner: winnerPlayer });
   } catch (err) {
     console.log("startBattle error:", err.message);
     res.status(500).json({ message: "Failed to start battle" });

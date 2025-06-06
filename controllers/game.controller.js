@@ -80,7 +80,38 @@ export const startBattle = async (req, res) => {
 
     console.log("Winner: ", winnerId);
 
-    const prompt = `Create a battle scenario story between Player 1 (${character1.name}) and Player 2 (${character2.name}) where the final winner after a tough fought out battle is to be ${winnerPlayer}: Player 1 description: ${character1.prompt} & Player 2 description: ${character2.prompt}. Player 1's weapon is ${weapon1.name} and its description is ${weapon1.prompt} & Player 2's weapon is ${weapon2.name} and its description is ${weapon2.prompt}. Player 1's stats - strength:${character1.strength}, agility:${character1.agility} , battleIq:${character1.battleIq} & Player 2's stats - strength:${character2.strength}, agility:${character2.agility}, battleIq:${character2.battleIq}. They are having an epic battle on the stage titled '${stage.name}' which has the following description: ${stage.description}. These details about the characters, weapons and stages are just for reference. Do not use them as it is in your story. Add some flair and use creative thinking to make up attacks or scenarios based up on those details.)`
+    const prompt = `Create a battle scenario story between Player 1 (${character1.name}) and Player 2 (${character2.name}), with ${winnerPlayer} as the winner. Use the following details for reference only (do not copy verbatim):
+
+• Player 1 description: ${character1.prompt}  
+• Player 2 description: ${character2.prompt}  
+
+• Player 1’s weapon: ${weapon1.name} (${weapon1.prompt})  
+• Player 2’s weapon: ${weapon2.name} (${weapon2.prompt})  
+
+• Player 1’s stats: strength ${character1.strength}, agility ${character1.agility}, battleIQ ${character1.battleIq}  
+• Player 2’s stats: strength ${character2.strength}, agility ${character2.agility}, battleIQ ${character2.battleIq}  
+
+They fight on the stage titled “${stage.name}” (description: ${stage.description}). Keep in mind all characters are male. Add creative flair and invent attacks based on these details.
+
+STRUCTURE and INSTRUCTIONS:  
+1. Randomly choose 1, 2, or 3 phases.  
+2. Write five sections: Intro, Phase 1, if(Phase 2), if(Phase 3), and Conclusion.  
+• Tag the Intro paragraph with <intro>…</intro>.  
+• Tag each Phase paragraph with <para>…</para>.  
+• If the number of phases chosen > 1, then in each Phase paragraph, begin with:  
+Phase {number}: **{Phase title}**. , then describe that phase’s content.  
+• Start the Conclusion paragraph with <conc>.  
+• Do NOT treat the last phase as the conclusion—they are separate.
+3. If any word or sentence is to be capitalised, then capitalise it.
+4. If any word or sentence is to be bold, then surround it by **{word/sentence to be bold}**.
+• In the conclusion paragraph, make the winner character name bold.
+
+WORD LIMIT: Maximum around 400 words total and do NOT abruptly cut off sentences in the end.
+
+NARRATION: Speak as a ${announcer.name} bot (description: ${announcer.description}), Your narration should be in ${announcer.voiceStyle} style.  
+
+Make sure that all instructions are followed for consistency. Start output generation only after thorough checking of all the instructions. Recheck if necessary before submitting final story.
+`
 
     const result = await simulateFight({ prompt, announcer });
 

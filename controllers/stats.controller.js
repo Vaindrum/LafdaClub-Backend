@@ -173,16 +173,12 @@ export const characterLeaderboards = async (req, res) => {
         $addFields: {
           wins: { $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] },
           winRatio: {
-             $round: [
-              {
+             
                 $cond: [
                   { $eq: ["$played", 0] },
                   0,
                   { $divide: [{ $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] }, "$played"] }
                 ]
-              },
-              2
-            ]
           }
         }
       },
@@ -264,16 +260,13 @@ export const weaponLeaderboards = async (req, res) => {
         $addFields: {
           wins: { $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] },
           winRatio: {
-             $round: [
-              {
+             
                 $cond: [
                   { $eq: ["$played", 0] },
                   0,
                   { $divide: [{ $ifNull: [{ $arrayElemAt: ["$winData.wins", 0] }, 0] }, "$played"] }
                 ]
-              },
-              2
-            ]
+              
           }
         }
       },
